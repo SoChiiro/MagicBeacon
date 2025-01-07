@@ -1,6 +1,5 @@
-
-![image](https://github.com/user-attachments/assets/a94b8278-0fab-4705-ab3a-0b3de703cf0f)
-
+# Magic Beacon
+![image](https://github.com/user-attachments/assets/46a49f9d-2b73-4c97-933d-fa57c39d03c0)
 
 Bienvenue dans **Magic Beacon**, une application mobile innovante pour les joueurs de jeux de cartes à collectionner (*Trading Card Games*), et plus particulièrement pour les fans de **Magic: The Gathering**. Cette application vise à devenir un réseau social dédié à la communauté des joueurs en leur permettant de se connecter, d’organiser des parties, et de partager leur passion.
 
