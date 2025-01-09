@@ -31,28 +31,18 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next(); // Ne hache que si le mot de passe est modifié ou nouveau
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 
 // Créer et exporter le modèle User
 module.exports = mongoose.model('User', UserSchema);
-
-// // Middleware "pre-save" pour hacher le mot de passe
-// UserSchema.pre('save', async function (next) {
-//   const user = this;
-
-//   // Si le mot de passe n'a pas été modifié, on passe à l'étape suivante
-//   if (!user.isModified('password')) return next();
-
-//   try {
-//     // Générer un sel et hacher le mot de passe
-//     const salt = await bcrypt.genSalt(10);
-//     user.password = await bcrypt.hash(user.password, salt);
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-// // Méthode pour comparer un mot de passe (utilisée lors de la connexion)
-// UserSchema.methods.comparePassword = async function (candidatePassword) {
-//   return bcrypt.compare(candidatePassword, this.password);
-// };

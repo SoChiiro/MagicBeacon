@@ -6,16 +6,27 @@ const User = require('../models/User');
 
 // Inscription utilisateur
 exports.register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, username } = req.body; // Ajoutez username ici
   try {
-    const user = await User.create({ email, password });
-    res.status(201).json({ message: 'User created successfully' });
+    // Validation des champs
+    if (!email || !password || !username) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    // Création de l'utilisateur
+    const user = await User.create({ email, password, username });
+    res.status(201).json({ message: 'User created successfully', user });
   } catch (error) {
+    console.error('Error during registration:', error.message);
+
+    if (error.code === 11000) { // Gérer l'erreur pour les champs uniques (email ou username)
+      return res.status(400).json({ error: 'Email or username already exists' });
+    }
+
     res.status(400).json({ error: 'Error creating user' });
-  } finally {
-    console.log("Vérification création du user : ", email , "\n mdp :", password);
   }
 };
+
 
 // Connexion
 exports.login = async (req, res) => {
