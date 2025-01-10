@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const authentificationMiddleware = (req, res, next) => { 
     let token = req.header('Authorization'); // Récupère le token dans l'en-tête
-    console.log('Token reçu:', token); // Affiche le token reçu pour vérification
+    console.log('Token reçu:', token);
 
     if (!token) {
         return res.status(401).json({ error: 'No token provided' });
@@ -10,11 +10,11 @@ const authentificationMiddleware = (req, res, next) => {
 
     // Retire "Bearer " du token
     if (token.startsWith('Bearer ')) {
-        token = token.slice(7, token.length).trim(); // Supprime "Bearer " et les espaces
+        token = token.slice(7, token.length).trim();
     }
 
     try {
-        const decoded = jwt.verify(token, 'secret_key'); // Vérifie et décode le token
+        const decoded = jwt.verify(token, 'secret_key');
         console.log('Token décodé:', decoded);
         req.user = decoded; // Ajoute les données du token à req.user
         next(); // Passe au middleware suivant
