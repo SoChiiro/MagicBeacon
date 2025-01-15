@@ -42,7 +42,5 @@ UserSchema.pre('save', async function (next) {
   }
 });
 
-
-
 // Créer et exporter le modèle User
 module.exports = mongoose.model('User', UserSchema);
