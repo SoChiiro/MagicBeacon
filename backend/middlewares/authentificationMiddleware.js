@@ -24,4 +24,14 @@ const authentificationMiddleware = (req, res, next) => {
     }
 };
 
+const validateObjectId = (req, res, next) => {
+    const { userId } = req.params;
+    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ error: 'Invalid userId format' });
+    }
+    next();
+  };
+
+
+module.exports = validateObjectId
 module.exports = authentificationMiddleware;

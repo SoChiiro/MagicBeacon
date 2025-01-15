@@ -1,0 +1,9 @@
+{
+  "extends": "@react-native/typescript-config/tsconfig.json",
+    "compilerOptions": {
+      "target": "es5",
+      "lib": ["dom", "esnext"],
+      "strict": true,
+      "jsx": "react"
+    }
+}
