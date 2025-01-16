@@ -18,7 +18,10 @@ const swaggerOptions = {
       },
     },
   },
-  apis: ['../backend/routes/authentificationRoutes.js', './routes/profileRoutes.js'],
+  apis: [
+    './api-docs/authentificationSwagger.js',
+    './api-docs/profileSwagger.js'
+  ],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
