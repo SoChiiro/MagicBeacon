@@ -9,7 +9,9 @@ import Profile from '../pages/Profile';
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
-  Profile: undefined;
+  Profile: { user: {
+      token: null; id: string; name: string; email: string; 
+} };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

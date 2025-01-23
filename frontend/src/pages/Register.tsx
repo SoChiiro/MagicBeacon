@@ -13,10 +13,6 @@ const Register: React.FC = () => {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const navigateToProfile = () => {
-    navigation.navigate('Profile');
-  };
-
   const isEmailValid = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -45,7 +41,7 @@ const Register: React.FC = () => {
   const handleRegister = async () => {
     if (!validateInputs()) return;
 
-    const apiUrl = 'http://192.168.1.158:5000/api/users/registerWithProfile';
+    const apiUrl = 'http://192.168.1.148:5000/api/users/registerWithProfile';
 
     try {
       const response = await fetch(apiUrl, {

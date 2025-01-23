@@ -10,12 +10,12 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const navigateToProfile = () => {
-    navigation.navigate('Profile');
-  };
+  // const navigateToProfile = () => {
+  //   navigation.navigate('Profile', { user: data });
+  // };
 
   const handleLogin = async () => {
-    const apiUrl = 'http://192.168.1.158:5000/api/users/login';
+    const apiUrl = 'http://192.168.1.148:5000/api/users/login';
 
     try {
       const response = await fetch(apiUrl, {
@@ -28,7 +28,9 @@ const Login: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        navigateToProfile();
+        console.log("Données à envoyer :", data)
+        navigation.navigate('Profile', { user: data })
+        // navigateToProfile('Profile', { user: data });
       } else {
         const error = await response.json();
         alert(`Erreur : ${error.message}`);

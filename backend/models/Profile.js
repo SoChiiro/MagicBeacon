@@ -6,9 +6,14 @@ const ProfileSchema = new mongoose.Schema({
     ref: 'User', // Référence au modèle User
     required: true,
   },
+  email: {
+    type: mongoose.Schema.Types.String,
+    ref: 'User',
+    required: true,
+  },
   photo: {
-    type: String, // URL de la photo de profil
-    default: '',
+    type: String, 
+    default: '../frontend/src/assets/pdpDefault.jpg'
   },
   description: {
     type: String,
@@ -16,7 +21,18 @@ const ProfileSchema = new mongoose.Schema({
   },
   decks: [
     {
-      type: String,
+      name: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+      commanderImage: {
+        type: String,
+        required: true,
+      },
     },
   ],
   preferences: {
