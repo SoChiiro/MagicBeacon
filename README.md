@@ -7,7 +7,7 @@ Bienvenue dans **Magic Beacon**, une application mobile innovante pour les joueu
 
 ## ✨ Fonctionnalités principales (prévues)
 
-### 🎮 1. Profils personnalisés
+### 🎮 1. Profils personnalisés 
 - Créez un profil utilisateur pour afficher vos préférences de jeu.
 - Ajoutez vos decks via des liens ou des intégrations avec des plateformes comme **Scryfall**,  **Moxfield** ou **Archidekt**.
 - Indiquez vos boutiques ou lieux préférés pour jouer.
