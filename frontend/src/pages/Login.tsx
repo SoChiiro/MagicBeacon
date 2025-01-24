@@ -25,6 +25,8 @@ const Login: React.FC = () => {
         },
         body: JSON.stringify({ email, password }),
       });
+      
+      console.log(response)
 
       if (response.ok) {
         const data = await response.json();
@@ -36,6 +38,7 @@ const Login: React.FC = () => {
         alert(`Erreur : ${error.message}`);
       }
     } catch (error) {
+      console.error('Erreur dans le handleLogin :', error);
       alert('Une erreur est survenue. Veuillez réessayer.');
     }
   };
