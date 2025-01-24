@@ -47,3 +47,46 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+// Mettre à jour un profil via userId
+exports.updateProfile = async (req, res) => {
+  const { userId } = req.params; 
+  const { username, description } = req.body;
+
+  try {
+    console.log('Requête de mise à jour pour l\'ID utilisateur :', userId);
+
+    // Vérifie si le profil existe
+    const profile = await Profile.findOne({ userId }).populate('userId', 'username email'); 
+    
+    if (!profile) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    if (username) {
+      const user = await User.findById(userId); // Récupère l'utilisateur lié
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      user.username = username;
+      await user.save(); // Sauvegarde l'utilisateur
+    }
+
+    if (description) {
+      profile.description = description;
+    }
+
+    // Assure que l'email est inclus lors de la sauvegarde du profil
+    profile.email = profile.email || (profile.userId && profile.userId.email);
+
+    await profile.save();
+
+    res.status(200).json({ message: 'Profile updated successfully', profile });
+  } catch (error) {
+    console.error('Error updating profile:', error.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+

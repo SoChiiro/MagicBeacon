@@ -77,8 +77,6 @@ exports.registerWithProfile = async (req, res) => {
   }
 };
 
-
-
 // Connexion utilisateur
 exports.login = async (req, res) => {
   const { email, password } = req.body;

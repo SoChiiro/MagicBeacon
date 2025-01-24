@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../routes/AppRoutes';
 import styles from '../styles/ProfileStyles';
@@ -13,10 +13,13 @@ const Profile: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [profileData, setProfileData] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false); // Mode édition activé ou non
+  const [updatedUsername, setUpdatedUsername] = useState<string | null>(null);
+  const [updatedDescription, setUpdatedDescription] = useState<string | null>(null);
 
   const getId = async () => {
     if (!email || !token) {
-      setErrorMessage("Les informations utilisateur ou le token sont manquants.");
+      setErrorMessage('Les informations utilisateur ou le token sont manquants.');
       return;
     }
 
@@ -27,7 +30,7 @@ const Profile: React.FC = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -36,16 +39,16 @@ const Profile: React.FC = () => {
         setUserId(data.userId);
       } else {
         const error = await response.json();
-        setErrorMessage(error.error || "Une erreur est survenue lors de la récupération de l'ID.");
+        setErrorMessage(error.error || 'Une erreur est survenue lors de la récupération de l\'ID.');
       }
     } catch (error) {
-      setErrorMessage("Impossible de récupérer l'ID de l'utilisateur.");
+      setErrorMessage('Impossible de récupérer l\'ID de l\'utilisateur.');
     }
   };
 
   const getProfile = async (id: string) => {
     if (!token) {
-      setErrorMessage("Le token est manquant pour récupérer le profil.");
+      setErrorMessage('Le token est manquant pour récupérer le profil.');
       return;
     }
 
@@ -56,19 +59,51 @@ const Profile: React.FC = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
         const data = await response.json();
         setProfileData(data);
+        setUpdatedUsername(data.userId.username); // Préremplit les champs d'édition
+        setUpdatedDescription(data.description);
       } else {
         const error = await response.json();
-        setErrorMessage(error.error || "Une erreur est survenue lors de la récupération du profil.");
+        setErrorMessage(error.error || 'Une erreur est survenue lors de la récupération du profil.');
       }
     } catch (error) {
-      setErrorMessage("Impossible de récupérer le profil de l'utilisateur.");
+      setErrorMessage('Impossible de récupérer le profil de l\'utilisateur.');
+    }
+  };
+
+  const updateProfile = async () => {
+    if (!userId || !token) return;
+
+    const apiUrl = `http://192.168.1.148:5000/api/profile/modification/${userId}`;
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          username: updatedUsername,
+          description: updatedDescription,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProfileData(data.profile); // Met à jour les données locales
+        setIsEditing(false); // Désactive le mode édition
+      } else {
+        const error = await response.json();
+        setErrorMessage(error.error || 'Une erreur est survenue lors de la mise à jour du profil.');
+      }
+    } catch (error) {
+      setErrorMessage('Impossible de mettre à jour le profil.');
     }
   };
 
@@ -88,46 +123,71 @@ const Profile: React.FC = () => {
 
   return (
     <View style={styles.containerProfile}>
-      {/* {profileData && (
-        <Image
-          source={
-            profileData.photo
-              ? { uri: profileData.photo }
-              : require('../assets/pdpDefault.jpg')
-          }
-          style={styles.profileImage}
-        />
-      )} */}
+      {/* Bouton pour activer/désactiver le mode édition */}
+      <TouchableOpacity
+        style={styles.editButton}
+        onPress={() => setIsEditing(!isEditing)}
+      >
+        <Text style={styles.editButtonText}>✏️</Text>
+      </TouchableOpacity>
+
+      {/* Image de profil */}
       <Image
-        source={{ uri: 'https://i.pinimg.com/474x/47/ba/71/47ba71f457434319819ac4a7cbd9988e.jpg' }}
+        source={require('../assets/pdpDefault.jpg')}
         style={styles.profileImage}
-        />
+      />
 
-
-
-      <Text style={styles.title}>Profil</Text> 
       {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+
       {profileData ? (
         <View>
-          <Text style={styles.welcomeText}>Bienvenue, {profileData.userId.username} !</Text>
-          <Text style={styles.detailsText}>Email : {profileData.userId.email}</Text>
-          <Text style={styles.detailsText}>Description : {profileData.description || 'Aucune description fournie.'}</Text>
+          {isEditing ? (
+            <>
+              <TextInput
+                style={styles.input}
+                value={updatedUsername || ''}
+                onChangeText={setUpdatedUsername}
+                placeholder="Modifier le nom d'utilisateur"
+              />
+              <TextInput
+                style={[styles.input, styles.textarea]}
+                value={updatedDescription || ''}
+                onChangeText={setUpdatedDescription}
+                placeholder="Modifier la description"
+                multiline
+              />
+              <TouchableOpacity style={styles.saveButton} onPress={updateProfile}>
+                <Text style={styles.saveButtonText}>Enregistrer</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Text style={styles.profileText}>{profileData.userId.username}</Text>
+              <Text style={styles.idProfileText}>@{profileData.userId.username}</Text>
+              <View style={styles.section}>
+                <Text style={styles.titleText}>À propos de moi</Text>
+                <View style={styles.profileContainer}>
+                <Text style={styles.aboutText}>
+                  {profileData.description || 'Aucune description fournie.'}
+                </Text>
+                </View>
+              </View>
+            </>
+          )}
         </View>
       ) : !errorMessage ? (
         <Text style={styles.loadingText}>Chargement des données...</Text>
       ) : null}
+
+      {/* Section Mes Decks */}
+      <View style={styles.section}>
+        <Text style={styles.titleText}>Mes Decks</Text>
+        <View style={styles.profileContainer}>
+          <Text style={styles.deckText}>Mon Deck</Text>
+        </View>
+      </View>
     </View>
   );
 };
 
 export default Profile;
-
-const localStyles = StyleSheet.create({
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-});

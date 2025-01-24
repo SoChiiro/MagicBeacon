@@ -9,5 +9,7 @@ router.get('/id/:email', validateObjectId, profileController.getIdFromMail);
 // Route pour récupérer un profil par userId
 router.get('/:userId', validateObjectId, profileController.getProfile);
 
+// ROute pour l'update des profiles
+router.put('/modification/:userId', validateObjectId , profileController.updateProfile);
 
 module.exports = router;
