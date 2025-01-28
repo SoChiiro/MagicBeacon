@@ -31,7 +31,6 @@ const ProfileSchema = new mongoose.Schema({
       },
       commanderImage: {
         type: String,
-        required: true,
       },
     },
   ],

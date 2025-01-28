@@ -12,4 +12,7 @@ router.get('/:userId', validateObjectId, profileController.getProfile);
 // ROute pour l'update des profiles
 router.put('/modification/:userId', validateObjectId , profileController.updateProfile);
 
+// Route pour l'update des profiles
+router.put('/add-deck/:userId', validateObjectId , profileController.addDeck);
+
 module.exports = router;
