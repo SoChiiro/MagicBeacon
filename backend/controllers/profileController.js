@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken');
 const Profile = require('../models/Profile');
 const User = require('../models/User');
 
+const multer = require('multer');
+const path = require('path');
+
 exports.getIdFromMail = async (req, res) => {
   const { email } = req.params;
 
@@ -116,5 +119,36 @@ exports.addDeck = async (req, res) => {
   } catch (error) {
     console.error('Erreur lors de l\'ajout du deck:', error.message);
     res.status(500).json({ error: 'Erreur serveur' });
+  }
+};
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Assurez-vous d'avoir ce dossier
+  },
+  filename: (req, file, cb) => {
+    const fileExtension = path.extname(file.originalname);
+    cb(null, `${Date.now()}${fileExtension}`);
+  },
+});
+
+const upload = multer({ storage });
+
+exports.uploadProfileImage = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const profile = await Profile.findOne({ userId });
+    if (!profile) {
+      return res.status(404).json({ error: 'Profil non trouvé' });
+    }
+
+    profile.photo = `/uploads/${req.file.filename}`;
+    await profile.save();
+
+    res.status(200).json({ message: 'Photo de profil mise à jour avec succès', photo: profile.photo });
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur serveur lors de la mise à jour de la photo de profil' });
   }
 };

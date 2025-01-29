@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { RouteProp, useRoute, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../routes/AppRoutes';
+import { ImageLibraryOptions, launchImageLibrary } from 'react-native-image-picker';
+
+
 import styles from '../styles/ProfileStyles';
 
 import DeckComponents from '../components/DeckComponents'; 
@@ -100,6 +103,72 @@ const Profile: React.FC = () => {
     }
   };
 
+  const uploadImage = async (uri: string) => {
+    if (!userId || !token) {
+      setErrorMessage('Les informations utilisateur ou le token sont manquants.');
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('photo', {
+      uri: Platform.OS === 'android' ? uri : uri.replace('file://', ''),
+      type: 'image/jpeg',
+      name: 'profile_picture.jpg',
+    } as any);
+    
+  
+    try {
+      const response = await fetch(`http://192.168.1.148:5000/api/profile/photo/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        // Mets à jour la photo du profil avec l'URL retournée
+        setProfileData({ ...profileData, photo: data.photo });
+      } else {
+        const error = await response.json();
+        setErrorMessage(error.error || "Erreur lors de la mise à jour de la photo.");
+      }
+    } catch (error) {
+      setErrorMessage("Erreur lors de l'upload de l'image.");
+    }
+  };
+  
+
+  const selectImage = () => {
+    const options: ImageLibraryOptions = {
+      mediaType: 'photo',
+      includeBase64: false,
+    };
+  
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log('L\'utilisateur a annulé la sélection d\'image');
+      } else if (response.errorCode) {
+        console.log('Erreur lors de la sélection de l\'image : ', response.errorMessage);
+      } else {
+        if (response.assets && response.assets.length > 0) {
+          const uri = response.assets[0].uri;
+  
+          if (uri) {
+            uploadImage(uri);
+          } else {
+            console.log('Aucune image n\'a été sélectionnée (uri est undefined)');
+          }
+        } else {
+          console.log('Aucune image n\'a été sélectionnée');
+        }
+      }
+    });
+  };
+  
+
   useEffect(() => {
     getId();
   }, [email, token]);
@@ -132,7 +201,21 @@ const Profile: React.FC = () => {
         <Text style={styles.editButtonText}>✏️</Text>
       </TouchableOpacity>
 
-      <Image source={require('../assets/pdpDefault.jpg')} style={styles.profileImage} />
+      <TouchableOpacity onPress={selectImage} style={styles.profileImageWrapper}>
+        <Image
+          source={profileData?.photo ? { uri: profileData.photo } : require('../assets/pdpDefault.jpg')}
+          style={styles.profileImage}
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.editButton} activeOpacity={0.7} onPress={() => {
+        console.log("Bouton pressé !");
+        setIsEditing(!isEditing);
+      }}>
+        <Text style={styles.editButtonText}>✏️</Text>
+      </TouchableOpacity>
+
+      {/* <Image source={require('../assets/pdpDefault.jpg')} style={styles.profileImage} /> */}
 
       {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
@@ -174,9 +257,9 @@ const Profile: React.FC = () => {
           decks={profileData?.decks}
           user={{
             token: token,
-            id: userId ?? '', // Si userId est null, on passe une chaîne vide par défaut
-            name: updatedUsername ?? '', // Si tu veux utiliser un autre champ pour le nom, fais-le ici
-            email: email ?? '', // Si email est null, on passe une chaîne vide par défaut
+            id: userId ?? '',
+            name: updatedUsername ?? '',
+            email: email ?? '',
           }}
         />
       </View>
