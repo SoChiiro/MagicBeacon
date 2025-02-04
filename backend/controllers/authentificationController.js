@@ -38,26 +38,44 @@ exports.registerWithProfile = async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
+    // Vérifie si un utilisateur avec le même email ou username existe déjà
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email or username already exists' });
+    }
+
     // Crée un nouvel utilisateur
     const newUser = new User({ email, password, username });
     await newUser.save();
 
-    // Crée un profil vide pour l'utilisateur
-    const newProfile = new Profile({ userId: newUser._id, name: 'Votre nom' });
+    // Crée un profil pour l'utilisateur avec les valeurs par défaut
+    const newProfile = new Profile({
+      userId: newUser._id,
+      email, // Associe l'email de l'utilisateur au profil
+      photo: 'https://via.placeholder.com/150', // Photo par défaut
+      description: 'Bienvenue sur votre profil !', // Description par défaut
+      decks: [], // Aucun deck au départ
+      preferences: [], // Préférences vides
+      location: '', // Localisation vide
+      favoriteStore: '', // Magasin favori vide
+    });
+
     await newProfile.save();
 
+    // Retourne l'utilisateur et son profil
     res.status(201).json({ user: newUser, profile: newProfile });
   } catch (error) {
     console.error('Error during registration with profile:', error.message);
 
-    if (error.code === 11000) { // Gérer l'erreur pour les champs uniques
+    // Gère l'erreur pour les champs uniques
+    if (error.code === 11000) {
       return res.status(400).json({ error: 'Email or username already exists' });
     }
 
+    // Gère les autres erreurs serveur
     res.status(500).json({ error: 'Server error' });
   }
 };
-
 
 // Connexion utilisateur
 exports.login = async (req, res) => {
@@ -74,7 +92,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id }, 'secret_key', { expiresIn: '1d' });
-    res.status(200).json({ token });
+    res.status(200).json({ token , email });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }

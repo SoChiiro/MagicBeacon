@@ -1,80 +1,46 @@
-// // Import des librarires essentiels
-// const express = require('express');
-// const mongoose = require('mongoose');
-// const cors = require('cors');
-// const userRoutes = require('../routes/authentificationRoutes');
-// const profileRoutes = require('../routes/profileRoutes');
-// const app = express();
-
-// require('dotenv').config({ path: '../backend/.env' });
-
-// app.use(cors());
-// app.use(express.json());
-
-// // Connexion à MongoDB
-// const connectDB = () => {
-//     const mongoURI = process.env.MONGO_URI;
-
-//     if (!mongoURI) {
-//         console.error('Error: MONGO_URI is not defined in your .env file');
-//         process.exit(1);
-//     }
-//     mongoose.connect(process.env.MONGO_URI)
-//       .then(() => console.log(process.env.MONGO_URI))
-//       .then(() => console.log('MongoDB is connected'))
-//       .catch(err => console.log(err));
-//   };
-  
-
-// // connectDB()
-// app.use('/api/users', userRoutes);
-// app.use('/api/profile', profileRoutes);
-
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// module.exports = connectDB;
-
-// Import des librarires essentiels
+// Import des bibliothèques essentielles
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('../routes/authentificationRoutes');
 const profileRoutes = require('../routes/profileRoutes');
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+require('dotenv').config(); // Charge les variables d'environnement
+
 const app = express();
 const swaggerDocs = require('../api-docs/swagger');
 
-require('dotenv').config({ path: '../backend/.env' });
-
-// Middleware de CORS et de parsing JSON
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // Connexion à MongoDB
-const connectDB = () => {
-  const mongoURI = process.env.MONGO_URI;
+const connectDB = async () => {
+    const mongoURI = process.env.MONGO_URI;
 
-  if (!mongoURI) {
-    console.error('Error: MONGO_URI is not defined in your .env file');
-    process.exit(1);
-  }
-  mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log(process.env.MONGO_URI))
-    .then(() => console.log('MongoDB is connected'))
-    .catch(err => console.log(err));
+    if (!mongoURI) {
+        console.error('❌ MONGO_URI non défini dans le fichier .env');
+        process.exit(1);
+    }
+
+    try {
+        await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+        console.log('✅ Connexion MongoDB réussie');
+    } catch (error) {
+        console.error('❌ Erreur de connexion MongoDB :', error.message);
+        process.exit(1);
+    }
 };
 
-// Routes de l'API
+// Connexion à la base de données
+connectDB();
+
+// Routes
 app.use('/api/users', userRoutes);
 app.use('/api/profile', profileRoutes);
 
-// Documentation Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-// Démarrer le serveur
+// Démarrage du serveur
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Serveur lancé sur le port ${PORT}`));
 
 module.exports = connectDB;
