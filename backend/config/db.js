@@ -54,17 +54,16 @@ app.use(express.json());
 
 // Connexion à MongoDB
 const connectDB = () => {
-  const mongoURI = process.env.MONGO_URI;
+    const mongoURI = process.env.MONGO_URI;
 
-  if (!mongoURI) {
-    console.error('Error: MONGO_URI is not defined in your .env file');
-    process.exit(1);
-  }
-  mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log(process.env.MONGO_URI))
-    .then(() => console.log('MongoDB is connected'))
-    .catch(err => console.log(err));
-};
+    if (!mongoURI) {
+        console.error('Error: MONGO_URI is not defined in your .env file');
+        process.exit(1);
+    }
+    mongoose.connect(process.env.MONGO_URI)
+      .then(() => console.log('MongoDB is connected'))
+      .catch(err => console.log(err));
+  };
 
 // Routes de l'API
 app.use('/api/users', userRoutes);
