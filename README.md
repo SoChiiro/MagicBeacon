@@ -9,6 +9,7 @@ Bienvenue dans **Magic Beacon**, une application mobile innovante pour les joueu
 
 ### 🎮 1. Profils personnalisés 
 - Créez un profil utilisateur pour afficher vos préférences de jeu.
+- - Inscription/Connexion terminé.
 - Ajoutez vos decks via des liens ou des intégrations avec des plateformes comme **Scryfall**,  **Moxfield** ou **Archidekt**.
 - Indiquez vos boutiques ou lieux préférés pour jouer.
 
@@ -49,6 +50,7 @@ Bienvenue dans **Magic Beacon**, une application mobile innovante pour les joueu
 ### APIs tierces
 - **Scryfall API** : Pour intégrer les cartes et les détails des decks.
 - **Google Maps API** : Pour la géolocalisation des joueurs et des boutiques.
+- **Moxfield et Archidekt" : Pour avoir un aperçu des decks
 
 ### Authentification
 - **Firebase Authentication** : Gérer les connexions via e-mail, Google, ou Facebook.
