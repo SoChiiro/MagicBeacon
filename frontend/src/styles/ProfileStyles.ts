@@ -11,6 +11,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
+  editModeTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+    color: '#FF5733', // Couleur pour bien le voir (modifiable)
+  },  
   profileText: {
     fontSize: 24,
     fontWeight: '600',
@@ -53,8 +60,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   profileImage: {
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
     borderRadius: 50,
     alignSelf: 'center',
     marginBottom: 20,
@@ -64,6 +71,24 @@ const styles = StyleSheet.create({
     shadowRadius: 6,              
     elevation: 10,   // Pour Android
     marginTop: '6%',
+  },
+  profileImageWrapper: {
+    width: 150,
+    height: 150,
+    borderRadius: 70,
+    borderWidth: 4,
+    borderColor: '#4C4C47',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    overflow: 'hidden',
+    position: 'relative',
+    backgroundColor: '#f0f0f0', 
+    marginVertical: 20,
+  },
+  profileImageEditing: {
+    opacity: 0.3,
+    backgroundColor: '#4C4C47',
   },
   input: {
     height: 40,
@@ -184,19 +209,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textDecorationLine: 'underline',
   },
-  profileImageWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 2,
-    borderColor: '#FFD700', // Bordure dorée pour un effet premium
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    backgroundColor: '#f0f0f0', // Fond gris clair en cas d'image manquante
-  },
-  
-  
   
 });
 

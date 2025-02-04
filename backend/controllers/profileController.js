@@ -136,19 +136,29 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 exports.uploadProfileImage = async (req, res) => {
+  console.log("Requête reçue pour l'upload !");
+  console.log("Params:", req.params);
+  console.log("File:", req.file);
+
   const { userId } = req.params;
 
   try {
     const profile = await Profile.findOne({ userId });
     if (!profile) {
+      console.log("Profil non trouvé !");
       return res.status(404).json({ error: 'Profil non trouvé' });
     }
 
-    profile.photo = `/uploads/${req.file.filename}`;
+    const fileUrl = `http://192.168.1.149:5000/uploads/${req.file.filename}`;
+    profile.photo = fileUrl;
     await profile.save();
 
-    res.status(200).json({ message: 'Photo de profil mise à jour avec succès', photo: profile.photo });
+    console.log("Photo enregistrée :", fileUrl);
+    res.status(200).json({ message: 'Photo de profil mise à jour avec succès', photo: fileUrl });
   } catch (error) {
+    console.error("Erreur serveur :", error);
     res.status(500).json({ error: 'Erreur serveur lors de la mise à jour de la photo de profil' });
   }
 };
+
+

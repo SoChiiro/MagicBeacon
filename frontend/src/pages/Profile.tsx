@@ -3,7 +3,7 @@ import { View, Text, Image, TextInput, TouchableOpacity, Platform } from 'react-
 import { RouteProp, useRoute, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../routes/AppRoutes';
 import { ImageLibraryOptions, launchImageLibrary } from 'react-native-image-picker';
-
+import { Alert } from 'react-native';
 
 import styles from '../styles/ProfileStyles';
 
@@ -32,7 +32,7 @@ const Profile: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.1.148:5000/api/profile/id/${email}`, {
+      const response = await fetch(`http://192.168.1.149:5000/api/profile/id/${email}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
@@ -56,7 +56,7 @@ const Profile: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.1.148:5000/api/profile/${id}`, {
+      const response = await fetch(`http://192.168.1.149:5000/api/profile/${id}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
@@ -79,28 +79,43 @@ const Profile: React.FC = () => {
 
   const updateProfile = async () => {
     if (!userId || !token) return;
-
-    try {
-      const response = await fetch(`http://192.168.1.148:5000/api/profile/modification/${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          username: updatedUsername,
-          description: updatedDescription,
-          location: updatedLocation,
-          favoriteStore: updatedStore,
-        }),
-      });
-
-      if (response.ok) {
-        setIsEditing(false); // Sort du mode édition et recharge le profil
-      } else {
-        const error = await response.json();
-        setErrorMessage(error.error || "Erreur lors de la mise à jour du profil.");
-      }
-    } catch (error) {
-      setErrorMessage('Impossible de mettre à jour le profil.');
-    }
+  
+    Alert.alert(
+      "Confirmation",
+      "Voulez-vous vraiment enregistrer les modifications ?",
+      [
+        {
+          text: "Annuler",
+          style: "cancel"
+        },
+        {
+          text: "Confirmer",
+          onPress: async () => {
+            try {
+              const response = await fetch(`http://192.168.1.149:5000/api/profile/modification/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({
+                  username: updatedUsername,
+                  description: updatedDescription,
+                  location: updatedLocation,
+                  favoriteStore: updatedStore,
+                }),
+              });
+  
+              if (response.ok) {
+                setIsEditing(false); // Sort du mode édition et recharge le profil
+              } else {
+                const error = await response.json();
+                setErrorMessage(error.error || "Erreur lors de la mise à jour du profil.");
+              }
+            } catch (error) {
+              setErrorMessage('Impossible de mettre à jour le profil.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   const uploadImage = async (uri: string) => {
@@ -118,26 +133,43 @@ const Profile: React.FC = () => {
     
   
     try {
-      const response = await fetch(`http://192.168.1.148:5000/api/profile/photo/${userId}`, {
+      console.log("Début de l'upload de la photo...");
+    
+      const apiUrl = `http://192.168.1.149:5000/api/profile/photo/${userId}`;
+      console.log("URL de l'API :", apiUrl);
+      
+      console.log("Token utilisé :", token ? "Présent" : "Absent");
+      console.log("Données envoyées :", formData);
+    
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-data',  // ⚠️ Problème potentiel ici
           Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
-  
+    
+      console.log("Réponse brute :", response);
+    
       if (response.ok) {
         const data = await response.json();
+        console.log("Réponse JSON :", data);
+    
         // Mets à jour la photo du profil avec l'URL retournée
         setProfileData({ ...profileData, photo: data.photo });
       } else {
         const error = await response.json();
+        console.error("Erreur retournée par l'API :", error);
         setErrorMessage(error.error || "Erreur lors de la mise à jour de la photo.");
       }
     } catch (error) {
+      console.error("Erreur dans le bloc catch :", error);
       setErrorMessage("Erreur lors de l'upload de l'image.");
     }
+    
+
+
   };
   
 
@@ -179,14 +211,12 @@ const Profile: React.FC = () => {
     }
   }, [userId, token]);
 
-  // 🔄 Recharge le profil après modification
   useEffect(() => {
     if (!isEditing && userId) {
       getProfile(userId);
     }
   }, [isEditing]);
 
-  // 🔄 Recharge aussi quand on revient sur l'écran
   useFocusEffect(
     useCallback(() => {
       if (userId) {
@@ -201,12 +231,19 @@ const Profile: React.FC = () => {
         <Text style={styles.editButtonText}>✏️</Text>
       </TouchableOpacity>
 
+      {isEditing && (
+        <Text style={styles.editModeTitle}>Modification du profil en cours</Text>
+      )}
+
       <TouchableOpacity onPress={selectImage} style={styles.profileImageWrapper}>
         <Image
           source={profileData?.photo ? { uri: profileData.photo } : require('../assets/pdpDefault.jpg')}
-          style={styles.profileImage}
+          style={[styles.profileImage, isEditing && styles.profileImageEditing]}
+          onError={(e) => console.log("Erreur chargement image :", e.nativeEvent.error)}
         />
       </TouchableOpacity>
+
+
 
       <TouchableOpacity style={styles.editButton} activeOpacity={0.7} onPress={() => {
         console.log("Bouton pressé !");

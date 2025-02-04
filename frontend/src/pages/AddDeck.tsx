@@ -25,7 +25,7 @@ const AddDeck: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.1.148:5000/api/profile/id/${email}`, {
+      const response = await fetch(`http://192.168.1.149:5000/api/profile/id/${email}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
@@ -54,7 +54,7 @@ const AddDeck: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.1.148:5000/api/profile/add-deck/${userId}`, {
+      const response = await fetch(`http://192.168.1.149:5000/api/profile/add-deck/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
