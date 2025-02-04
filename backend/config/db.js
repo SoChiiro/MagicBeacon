@@ -7,6 +7,7 @@ const profileRoutes = require('../routes/profileRoutes');
 require('dotenv').config(); // Charge les variables d'environnement
 
 const app = express();
+const swaggerDocs = require('../api-docs/swagger');
 
 // Middleware
 app.use(cors());
