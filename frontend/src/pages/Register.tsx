@@ -41,7 +41,7 @@ const Register: React.FC = () => {
   const handleRegister = async () => {
     if (!validateInputs()) return;
 
-    const apiUrl = 'http://192.168.1.148:5000/api/users/registerWithProfile';
+    const apiUrl = 'http://192.168.1.149:5000/api/users/registerWithProfile';
 
     try {
       const response = await fetch(apiUrl, {
